@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Portfolio Project</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Global styles */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #0056b3;
+    }
+
+    nav a {
+      color: white;
+      padding: 1rem;
+      text-decoration: none;
+    }
+
+    nav a:hover {
+      background-color: #003f7f;
+    }
+
+    section {
+      padding: 2rem;
+      background: white;
+      margin: 1rem auto;
+      max-width: 1000px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+      }
+      section {
+        margin: 0.5rem;
+      }
+    }
+
+    /* To-Do App */
+    #todo-list li {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    #todo-list button {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      cursor: pointer;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .product-card {
+      background: #f0f0f0;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    select {
+      padding: 6px;
+    }
+
+    input[type="text"] {
+      padding: 6px;
+      flex-grow: 1;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>My Portfolio</h1>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#projects">Projects</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<!-- About Section -->
+<section id="about">
+  <h2>About Me</h2>
+  <p>Hello! I'm a web developer passionate about building responsive and interactive websites using HTML, CSS, and JavaScript.</p>
+</section>
+
+<!-- Projects Section -->
+<section id="projects">
+  <h2>Projects</h2>
+
+  <!-- To-Do App with LocalStorage -->
+  <div>
+    <h3>To-Do List (with Local Storage)</h3>
+    <input type="text" id="todo-input" placeholder="Add a task...">
+    <ul id="todo-list"></ul>
+  </div>
+
+  <hr>
+
+  <!-- Product Filter/Sort -->
+  <div>
+    <h3>Product Listing with Filters</h3>
+    <div class="controls">
+      <select id="filter-category">
+        <option value="all">All Categories</option>
+        <option value="tech">Tech</option>
+        <option value="clothing">Clothing</option>
+      </select>
+
+      <select id="sort-price">
+        <option value="none">Sort by Price</option>
+        <option value="asc">Low to High</option>
+        <option value="desc">High to Low</option>
+      </select>
+    </div>
+
+    <div class="product-grid" id="product-list">
+      <!-- Products inserted dynamically -->
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact">
+  <h2>Contact Me</h2>
+  <p>Email: vayyavurulikitha15@gmail.com</p>
+  <p>Phone: 7731907013</p>
+</section>
+
+<script>
+  // ================= To-Do List with LocalStorage =================
+  const todoInput = document.getElementById('todo-input');
+  const todoList = document.getElementById('todo-list');
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+  function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+
+  function renderTasks() {
+    todoList.innerHTML = '';
+    tasks.forEach((task, index) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${task} <button onclick="deleteTask(${index})">X</button>`;
+      todoList.appendChild(li);
+    });
+  }
+
+  function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
+  }
+
+  todoInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const task = todoInput.value.trim();
+      if (task) {
+        tasks.push(task);
+        todoInput.value = '';
+        saveTasks();
+        renderTasks();
+      }
+    }
+  });
+
+  renderTasks();
+
+  // ================= Product List with Filter/Sort =================
+  const productData = [
+    { name: "Laptop", category: "tech", price: 1200 },
+    { name: "Headphones", category: "tech", price: 100 },
+    { name: "T-Shirt", category: "clothing", price: 25 },
+    { name: "Smartphone", category: "tech", price: 800 },
+    { name: "Jeans", category: "clothing", price: 40 },
+  ];
+
+  const productList = document.getElementById('product-list');
+  const filterCategory = document.getElementById('filter-category');
+  const sortPrice = document.getElementById('sort-price');
+
+  function renderProducts() {
+    let products = [...productData];
+
+    // Filtering
+    const selectedCategory = filterCategory.value;
+    if (selectedCategory !== 'all') {
+      products = products.filter(p => p.category === selectedCategory);
+    }
+
+    // Sorting
+    const sort = sortPrice.value;
+    if (sort === 'asc') {
+      products.sort((a, b) => a.price - b.price);
+    } else if (sort === 'desc') {
+      products.sort((a, b) => b.price - a.price);
+    }
+
+    // Render
+    productList.innerHTML = '';
+    products.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'product-card';
+      div.innerHTML = `<strong>${p.name}</strong><br>$${p.price}<br><em>${p.category}</em>`;
+
+      productList.appendChild(div);
+    });
+  }
+
+  filterCategory.addEventListener('change', renderProducts);
+  sortPrice.addEventListener('change', renderProducts);
+
+  renderProducts();
+</script>
+
+</body>
+</html>
